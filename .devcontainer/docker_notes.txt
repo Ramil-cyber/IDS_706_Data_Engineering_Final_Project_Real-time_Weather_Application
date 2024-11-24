@@ -1,0 +1,6 @@
+# For creating the image
+docker build -f .devcontainer/Dockerfile -t final_project_ids_706 .
+
+# For creating container
+docker run -p 8501:8501 final_project_ids_706
+
