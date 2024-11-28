@@ -3,6 +3,7 @@ import folium
 from streamlit_folium import st_folium
 import random
 import pandas as pd
+import altair as alt
 
 
 ################## This part will change in next week
@@ -44,8 +45,24 @@ def get_forecast():
 # Fetch forecast data
 forecast_data = get_forecast()
 df = pd.DataFrame(forecast_data)
-next_day_forecast = df.iloc[0:1].set_index("date")
+df['date'] = pd.to_datetime(df['date'])
+#next_day_forecast = df.iloc[0:1].set_index("date")
+# Create an Altair area chart for temperature spread
+spread_chart = alt.Chart(df).mark_area(opacity=0.4, color="lightblue").encode(
+    x=alt.X('date:T', title='Date', axis=alt.Axis(format='%b %d')),  # Format date as "Month Day"
+    y=alt.Y('min_temp:Q', title='Temperature (°C)', scale=alt.Scale(zero=False)),
+    y2='max_temp:Q'
+)
 
+# Add a line for average temperature
+avg_temp_line = alt.Chart(df).mark_line(color='blue', strokeWidth=2).encode(
+    x='date:T',
+    y='avg_temp:Q',
+    tooltip=['date:T', 'avg_temp:Q', 'min_temp:Q', 'max_temp:Q']
+)
+
+# Combine the spread and line chart
+chart = spread_chart + avg_temp_line
 
 
 
@@ -119,21 +136,25 @@ st.sidebar.markdown(
     <style>
         [data-testid="stSidebar"]::before {
             content: "Weather Information";
-            position: absolute;
-            top: 20px;
-            left: 30px;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center;    /* Center vertically */
+            height: 50px;           /* Define height for vertical centering */
             font-size: 20px;
             font-weight: bold;
-            color: #2a3d42; /* Text color */
+            color: #2a3d42;         /* Text color */
             background-color: #cce7f0; /* Background color */
-            padding: 15px 40px;
-            border: 1px solid #4c98af; /* Black outline */
-            border-radius: 3px; /* Rounded corners */
+            padding: 0px 10px;      /* Adjust padding */
+            border: 1px solid #4c98af; /* Border color */
+            border-radius: 3px;     /* Rounded corners */
+            margin-bottom: 10px;    /* Adds spacing below the label */
         }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+
 
     
 st_data = st_folium(world_map, use_container_width = True, height=800)  # Adjust dimensions for a wider layout
@@ -155,7 +176,6 @@ if st_data and "last_object_clicked" in st_data and st_data["last_object_clicked
     # Get the icon for the current description
     description_icon = description_icon_map.get(description, "🌡️")
  
-
     st.sidebar.title(city_name)
     
    # Create a layout for temperature metric and description icon
@@ -188,9 +208,11 @@ if st_data and "last_object_clicked" in st_data and st_data["last_object_clicked
         st.metric(label="💨 Wind Speed", value=f"{wind_speed} m/s", delta=None)
         
     # forcast table
-    st.sidebar.subheader("Tomorrow Forecast")
-    st.sidebar.dataframe(next_day_forecast[["avg_temp", "description"]])
-  
+    st.sidebar.subheader("Temperture Forecast")
+    #st.sidebar.dataframe(next_day_forecast[["avg_temp", "description"]])
+    with st.sidebar:
+        st.altair_chart(chart, use_container_width=True)
+
 
   
     
