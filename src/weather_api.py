@@ -124,7 +124,7 @@ class WeatherAPI:
 # Example usage
 if __name__ == "__main__":
     # Configuration
-    api_key = "your_api_key_here"  # Replace with your actual API key
+    api_key = "b38066974d9946f466ce5632a763aed3"  # Replace with your actual API key
     city_name = "San Francisco"  # Replace with your desired city
     forecast_days = 5  # Number of days for forecast
 
@@ -150,16 +150,18 @@ if __name__ == "__main__":
 
     # Get and display forecast
     print(f"\n{forecast_days}-Day Weather Forecast for {city_name}:")
-    forecast = weather.get_forecast(city_name, forecast_days)
-    if forecast is not None:
-        for day in forecast:
-            print(f"\n{day['date']}:")
-            print(
-                f"  Temperature: {day['min_temp']}°C to {day['max_temp']}°C (avg: {day['avg_temp']}°C)"
-            )
-            print(f"  Description: {day['description']}")
-            print(f"  Wind Speed: {day['avg_wind']} m/s")
-    else:
-        print(
-            "Failed to get forecast data. Please check your API key and internet connection."
-        )
+    forecast = weather.get_forecast(city_name)
+    print(forecast)
+    # if forecast is not None:
+    #     for day in forecast:
+    #         print(f"\n{day['date']}:")
+    #         print(type(day['date']))
+    #         print(
+    #             f"  Temperature: {day['min_temp']}°C to {day['max_temp']}°C (avg: {day['avg_temp']}°C)"
+    #         )
+    #         print(f"  Description: {day['description']}")
+    #         print(f"  Wind Speed: {day['avg_wind']} m/s")
+    # else:
+    #     print(
+    #         "Failed to get forecast data. Please check your API key and internet connection."
+    #     )

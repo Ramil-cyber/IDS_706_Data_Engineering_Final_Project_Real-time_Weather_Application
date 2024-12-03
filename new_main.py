@@ -4,8 +4,12 @@ from streamlit_folium import st_folium
 import random
 import pandas as pd
 import altair as alt
+from src import WeatherDatabaseApi
 
 
+WeatherDb = WeatherDatabaseApi(
+     'data/db/application', deploy_database = False
+)
 ################## This part will change in next week
 def get_live_data():
     current_Temp = random.randint(-10, 50)  # Simulated current temperature
@@ -120,11 +124,14 @@ world_map = folium.Map(
         zoom_start=4,
     )
 
-for city in cities:
+
+city_data = WeatherDb.get_active_states()
+
+for city_location, city_details in city_data.items():
     folium.Marker(
-        [city["lat"], city["lon"]],
-        popup=city["name"],  # Show city name on click
-        tooltip=city["name"],  # Tooltip shows on hover
+        [city_location[0], city_location[1]],
+        popup=city_details["city"],  # Show city name on click
+        tooltip=city_details["city"],  # Tooltip shows on hover
     ).add_to(world_map)
 
 
@@ -159,93 +166,99 @@ st.sidebar.markdown(
     
 st_data = st_folium(world_map, use_container_width = True, height=800)  # Adjust dimensions for a wider layout
 
-
 if st_data and "last_object_clicked" in st_data and st_data["last_object_clicked"]:
     clicked_city = st_data["last_object_clicked"]
-    city_name = 'Los Angeles'
+    print(f"Clicked City : {clicked_city}")
+    # print(f"City Data : {city_data}")
+    if city_data.get((clicked_city['lat'], clicked_city['lng'])):
 
-    # Generate live data
-    live_data = get_live_data()
-    current_temp=live_data["current_Temp"]
-    feels_like_temp=live_data["feels_like_temp"]
-    humidity=live_data["humidity"]
-    wind_speed=live_data["wind_speed"]
-    feel_vs_true = feels_like_temp - current_temp
-    description = live_data["description"]
+        city_details = city_data.get((clicked_city['lat'], clicked_city['lng']))
+        city_name = city_details.get('city')
+        city_state = city_details.get('state')
 
-    # Get the icon for the current description
-    description_icon = description_icon_map.get(description, "🌡️")
- 
-    st.sidebar.title(city_name)
+        # Generate live data
+        live_data = get_live_data()
+        current_temp=live_data["current_Temp"]
+        feels_like_temp=live_data["feels_like_temp"]
+        humidity=live_data["humidity"]
+        wind_speed=live_data["wind_speed"]
+        feel_vs_true = feels_like_temp - current_temp
+        description = live_data["description"]
+
+        # Get the icon for the current description
+        description_icon = description_icon_map.get(description, "🌡️")
+
+        st.sidebar.title(city_name)
+
+        # Create a layout for temperature metric and description icon
+        col11, col12 = st.sidebar.columns([3, 1])  # Adjust column ratios for spacing
+
+        # Display temperature metric in the first column
+        with col11:
+            st.metric(
+                label="Temperature", 
+                value=f"{current_temp}°C", 
+                delta=f"Feels {feel_vs_true:+}°C"
+            )
+
+        # Display enlarged icon in the second column
+        with col12:
+                st.markdown(
+                f"""
+                <div style="font-size: 50px; text-align: left; margin-left: -60px; margin-top: 20px;">{description_icon}</div>
+                """,
+            unsafe_allow_html=True,
+            )
+
+        # Humidity and Wind Speed on the Same Line
+        col21, col22 = st.sidebar.columns(2)
+
+        with col21:
+            st.metric(label="💧 Humidity", value=f"{humidity}%", delta=None)
+
+        with col22:
+            st.metric(label="💨 Wind Speed", value=f"{wind_speed} m/s", delta=None)
+            
+        # forcast table
+        st.sidebar.subheader("Temperture Forecast")
+        #st.sidebar.dataframe(next_day_forecast[["avg_temp", "description"]])
+        with st.sidebar:
+            st.altair_chart(chart, use_container_width=True)
+
+
+
+
+
+        # Update the sidebar with the city data
+        # st.sidebar.subheader(f"City: {city_name}")
+        # st.sidebar.write(f"Live Data: {live_data}")
+        # st.sidebar.write("Additional Information:")
+        # st.sidebar.write(f"Coordinates: {clicked_city}")
+        # st.sidebar.title("Weather Settings")
+
+        # Sidebar Fields
+        # 1. Location Input
+        # location = st.sidebar.text_input("Enter Location", placeholder="e.g., New York, USA")
+
+        # 2. Date Range Picker
+        # st.sidebar.subheader("Select Date Range")
+        # date_range = st.sidebar.date_input(
+        #     "Choose dates", 
+        #     value=[None, None],  # Default value is empty
+        #     help="Select a specific date or a range to get historical or forecast data"
+        # )
+
+        # 3. Weather Metrics
+        st.sidebar.subheader("Other Information")
+
+        # Display the entered note
+        st.sidebar.write("Climate detail:")
+        st.sidebar.write(other_information)
+
     
-   # Create a layout for temperature metric and description icon
-    col11, col12 = st.sidebar.columns([3, 1])  # Adjust column ratios for spacing
-
-# Display temperature metric in the first column
-    with col11:
-        st.metric(
-            label="Temperature", 
-            value=f"{current_temp}°C", 
-            delta=f"Feels {feel_vs_true:+}°C"
-        )
-
-# Display enlarged icon in the second column
-    with col12:
-            st.markdown(
-            f"""
-            <div style="font-size: 50px; text-align: left; margin-left: -60px; margin-top: 20px;">{description_icon}</div>
-            """,
-        unsafe_allow_html=True,
-        )
-
-    # Humidity and Wind Speed on the Same Line
-    col21, col22 = st.sidebar.columns(2)
-
-    with col21:
-        st.metric(label="💧 Humidity", value=f"{humidity}%", delta=None)
-
-    with col22:
-        st.metric(label="💨 Wind Speed", value=f"{wind_speed} m/s", delta=None)
-        
-    # forcast table
-    st.sidebar.subheader("Temperture Forecast")
-    #st.sidebar.dataframe(next_day_forecast[["avg_temp", "description"]])
-    with st.sidebar:
-        st.altair_chart(chart, use_container_width=True)
-
-
-  
     
-
-    # Update the sidebar with the city data
-    # st.sidebar.subheader(f"City: {city_name}")
-    # st.sidebar.write(f"Live Data: {live_data}")
-    # st.sidebar.write("Additional Information:")
-    # st.sidebar.write(f"Coordinates: {clicked_city}")
-    # st.sidebar.title("Weather Settings")
-
-    # Sidebar Fields
-    # 1. Location Input
-    # location = st.sidebar.text_input("Enter Location", placeholder="e.g., New York, USA")
-
-    # 2. Date Range Picker
-    # st.sidebar.subheader("Select Date Range")
-    # date_range = st.sidebar.date_input(
-    #     "Choose dates", 
-    #     value=[None, None],  # Default value is empty
-    #     help="Select a specific date or a range to get historical or forecast data"
-    # )
-
-    # 3. Weather Metrics
-    st.sidebar.subheader("Other Information")
-
-    # Display the entered note
-    st.sidebar.write("Climate detail:")
-    st.sidebar.write(other_information)
-    
-    
-    
-else: st.sidebar.write("Select a city from the map to see more details.")
+else: 
+    st.sidebar.write("Select a city from the map to see more details.")
     # metrics = st.sidebar.multiselect(
     #     "Select Metrics to Display", 
     #     options=["Temperature", "Humidity", "Wind Speed", "Precipitation", "UV Index"],
