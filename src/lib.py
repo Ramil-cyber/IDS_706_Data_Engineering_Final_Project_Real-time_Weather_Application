@@ -12,6 +12,7 @@ def process_raw_cities_csv(
 
     return True
 
+
 if __name__ == "__main__":
     process_raw_cities_csv(
         file_path="data/csv/raw/uscities.csv",
