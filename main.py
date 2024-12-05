@@ -127,7 +127,10 @@ def display_sidebar(city_details, live_data, chart, other_information):
         "scattered clouds": "🌥️",
         "rain": "🌧️",
         "snow": "❄️",
-        "overcast clouds": "☁️",  # Added icon for overcast clouds
+        "overcast clouds": "☁️",
+        "few clouds": "🌤️",
+        "thunderstorm": "🌩️",
+        "mist": "🌫️"
     }
 
     description_icon = description_icon_map.get(description)
