@@ -24,13 +24,14 @@ def get_live_data(city_name):
     weather_api = initialize_api()
 
     current = weather_api.get_current_weather(city_name)
-    print(current['description'])
+    print(current['main_description'])
     return {
         "current_Temp": round(current['temperature'], 1),
         "feels_like_temp": round(current['feels_like'], 1),
         "humidity": round(current['humidity'], 1),
         "wind_speed": round(current['wind_speed'],1),
         "description": current['description'],
+        "main_description" : current['main_description']
     }
 
 def get_forecast(city_name):
@@ -121,7 +122,7 @@ def display_sidebar(city_details, live_data, chart, other_information):
     current_temp = live_data["current_Temp"]
     feels_like_temp = live_data["feels_like_temp"]
     feel_vs_true = round(feels_like_temp - current_temp, 1)
-    description = live_data["description"]
+    description = live_data["main_description"]
     description_icon_map = {
         "clear sky": "☀️",
         "scattered clouds": "🌥️",
@@ -130,10 +131,21 @@ def display_sidebar(city_details, live_data, chart, other_information):
         "overcast clouds": "☁️",
         "few clouds": "🌤️",
         "thunderstorm": "🌩️",
-        "mist": "🌫️"
+        "clouds": "☁️",  # General representation of clouds
+        "clear": "☀️",  # Clear weather
+        "tornado": "🌪️",  # Tornado icon
+        "squall": "🌬️",  # Strong wind/squall
+        "ash": "🌋",  # Volcanic ash
+        "dust": "🌪️",  # Dust storm (same as tornado for simplicity)
+        "sand": "🏜️",  # Sandstorm
+        "fog": "🌁",  # Foggy weather, represented with a bridge in the mist
+        "haze": "🌅",  # Hazy conditions, often associated with a sun obscured by haze
+        "mist": "🌫️",  # Misty weather, depicted with low visibility
+        "smoke": "💨",  # Smoke
+        "drizzle": "🌦️"  # Light rain/drizzle
     }
 
-    description_icon = description_icon_map.get(description)
+    description_icon = description_icon_map.get(description.lower())
 
     col11, col12 = st.sidebar.columns([3, 1])
 
@@ -172,18 +184,18 @@ def main():
         initial_sidebar_state="collapsed",
     )
 
-    WeatherDb = initialize_weather_db()
     
+    # other_information = """The climate of Durham is humid subtropical
+    # (Cfa according to the Köppen classification system)
+    # , with hot and humid summers, cool winters, and warm to mild spring and autumn."""
 
-    other_information = """The climate of Durham is humid subtropical
-    (Cfa according to the Köppen classification system)
-    , with hot and humid summers, cool winters, and warm to mild spring and autumn."""
-
+    WeatherDb = initialize_weather_db()
 
     world_map, city_data = create_map(WeatherDb)
     st_data = st_folium(world_map, use_container_width=True, height=800)
 
     if st_data and "last_object_clicked" in st_data and st_data["last_object_clicked"]:
+
         clicked_city = st_data["last_object_clicked"]
         if city_data.get((clicked_city['lat'], clicked_city['lng'])):
             city_details = city_data.get((clicked_city['lat'], clicked_city['lng']))
@@ -193,6 +205,7 @@ def main():
             print(f"Forecast - {forecast_data}")
             chart = create_forecast_chart(forecast_data)
 
+            other_information = WeatherDb.get_interesting_fact_for_location(clicked_city['lat'], clicked_city['lng'])
             display_sidebar(city_details, live_data, chart, other_information)
 
     else:

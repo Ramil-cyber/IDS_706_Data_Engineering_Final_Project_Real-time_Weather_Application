@@ -17,6 +17,7 @@ class WeatherDatabaseApi():
 
     necessary_csv_files = {
         "CityLocation" : 'https://raw.githubusercontent.com/Cavidan-oss/IDS_706_Final_Project/refs/heads/main/data/csv/processed/uscities_processed.csv',
+        "CityInterestingFact" : "https://raw.githubusercontent.com/Cavidan-oss/IDS_706_Final_Project/refs/heads/main/data/csv/raw/city_facts.csv"
     }
 
     def __init__(self, database_connection_string, deploy_database = False) -> None:
@@ -31,6 +32,9 @@ class WeatherDatabaseApi():
             if not db_status:
                 self.create_necessary_tables()
                 print("Created necessary tables.")
+
+                for table_name, csv_path in WeatherDatabaseApi.necessary_csv_files.items():
+                    self.push_csv_to_db(csv_path, table_name, truncate_before_inserting = True)
 
 
     def connect_to_db(self, database_connection_string):
@@ -125,10 +129,22 @@ class WeatherDatabaseApi():
                     zips TEXT,
                     id INTEGER,
                     active_cities INTEGER
-                );      
+                );  
+        """
+
+        create_table2 = """
+            CREATE TABLE IF NOT EXISTS CityInterestingFact (
+                    id INTEGER PRIMARY KEY,
+                    city TEXT,
+                    state_name TEXT,
+                    fact TEXT
+                );
         """
 
         self.execute_query(create_table)
+
+        self.execute_query(create_table2)
+
 
         return True
 
@@ -213,6 +229,21 @@ class WeatherDatabaseApi():
         res = {(row[0], row[1]) : { "state" : row[2], "city" : row[3] } for row in raw_res }
 
         return res
+    
+    def get_interesting_fact_for_location(self, lat, long, randomize = True):
+
+        query = """
+            SELECT cif.fact FROM CityInterestingFact cif
+            LEFT JOIN CityLocation cl ON cif.city = cl.city AND cl.state_name = cif.state_name
+            WHERE lat = {lat} AND lng = {long} 
+        """
+
+        raw_res = self.get_one_item(query.format(lat = lat , long = long))
+
+
+        return raw_res[0]        
+
+
 
     def exit(self):
         current_conn = self.get_connection()
@@ -228,12 +259,16 @@ if __name__ == '__main__':
 
     test_connection = WeatherDatabaseApi( 'data/db/application', deploy_database = True )
 
-    test_connection.push_csv_to_db(WeatherDatabaseApi.necessary_csv_files.get('CityLocation'), 'CityLocation', True, True)
+    test_connection.execute_query(""" UPDATE CityLocation SET active_cities = 1 WHERE city = 'Miami' and state_name = 'Florida' """)
+    # res = test_connection.get_interesting_fact_for_location( 40.6943,  -73.9249)
 
-    query = "SELECT lat, lng, state_name, city FROM CityLocation WHERE active_cities = 1;"
+    # print(res)
+    # test_connection.push_csv_to_db(WeatherDatabaseApi.necessary_csv_files.get('CityLocation'), 'CityLocation', True, True)
 
-    # res = test_connection.get_all_item(query)
-    res = test_connection.get_active_states()
-    print(res)
-    test_connection.exit()
+    # query = "SELECT lat, lng, state_name, city FROM CityLocation WHERE active_cities = 1;"
+
+    # # res = test_connection.get_all_item(query)
+    # res = test_connection.get_active_states()
+    # print(res)
+    # test_connection.exit()
 

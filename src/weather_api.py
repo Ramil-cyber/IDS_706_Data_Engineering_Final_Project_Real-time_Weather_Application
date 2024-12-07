@@ -28,11 +28,12 @@ class WeatherAPI:
 
             if "main" not in data or "weather" not in data:
                 raise ValueError(f"Unexpected API response format: {data}")
-
+            print(data)
             weather_info = {
                 "temperature": data["main"]["temp"],
                 "feels_like": data["main"]["feels_like"],
                 "humidity": data["main"]["humidity"],
+                "main_description" : data["weather"][0]["main"],
                 "description": data["weather"][0]["description"],
                 "wind_speed": data["wind"]["speed"],
                 "city": data["name"],
@@ -125,7 +126,7 @@ class WeatherAPI:
 if __name__ == "__main__":
     # Configuration
     api_key = "b38066974d9946f466ce5632a763aed3"  # Replace with your actual API key
-    city_name = "San Francisco"  # Replace with your desired city
+    city_name = "New York"  # Replace with your desired city
     forecast_days = 5  # Number of days for forecast
 
     # Initialize weather API
@@ -133,25 +134,25 @@ if __name__ == "__main__":
 
     # Get and display current weather
     current = weather.get_current_weather(city_name)
-    if current is not None:
-        print("\nCurrent Weather:")
-        print(f"City: {current['city']}, {current['country']}")
-        print(f"Temperature: {current['temperature']}°C")
-        print(f"Feels like: {current['feels_like']}°C")
-        print(f"Description: {current['description']}")
-        print(f"Humidity: {current['humidity']}%")
-        print(f"Wind Speed: {current['wind_speed']} m/s")
-        print(f"Sunrise: {current['sunrise']}")
-        print(f"Sunset: {current['sunset']}")
-    else:
-        print(
-            "Failed to get weather data. Please check your API key and internet connection."
-        )
+    # if current is not None:
+    #     print("\nCurrent Weather:")
+    #     print(f"City: {current['city']}, {current['country']}")
+    #     print(f"Temperature: {current['temperature']}°C")
+    #     print(f"Feels like: {current['feels_like']}°C")
+    #     print(f"Description: {current['description']}")
+    #     print(f"Humidity: {current['humidity']}%")
+    #     print(f"Wind Speed: {current['wind_speed']} m/s")
+    #     print(f"Sunrise: {current['sunrise']}")
+    #     print(f"Sunset: {current['sunset']}")
+    # else:
+    #     print(
+    #         "Failed to get weather data. Please check your API key and internet connection."
+    #     )
 
-    # Get and display forecast
-    print(f"\n{forecast_days}-Day Weather Forecast for {city_name}:")
-    forecast = weather.get_forecast(city_name)
-    print(forecast)
+    # # Get and display forecast
+    # print(f"\n{forecast_days}-Day Weather Forecast for {city_name}:")
+    # forecast = weather.get_forecast(city_name)
+    # print(forecast)
     # if forecast is not None:
     #     for day in forecast:
     #         print(f"\n{day['date']}:")
