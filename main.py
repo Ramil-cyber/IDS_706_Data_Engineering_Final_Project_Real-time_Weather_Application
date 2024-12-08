@@ -117,7 +117,20 @@ def display_sidebar(city_details, live_data, chart, other_information):
     """Update the sidebar with city weather details."""
     city_name = city_details.get('city')
 
-    st.sidebar.title(city_name)
+    st.markdown(
+    """
+    <style>
+    [data-testid="stSidebar"] h1 {
+        margin-top: 0px; /* Adjust this value */
+        font-size: 50px; /* Adjust font size if needed */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+    )
+
+    # Sidebar title
+    st.sidebar.markdown(f"<h1>{city_name}</h1>", unsafe_allow_html=True)
 
     current_temp = live_data["current_Temp"]
     feels_like_temp = live_data["feels_like_temp"]
@@ -168,7 +181,7 @@ def display_sidebar(city_details, live_data, chart, other_information):
     with col22:
         st.metric(label="💨 Wind Speed", value=f"{live_data['wind_speed']} m/s", delta=None)
 
-    st.sidebar.subheader("Temperature Forecast")
+    st.sidebar.subheader("Temperature Forecast [Min~Max]")
     with st.sidebar:
         st.altair_chart(chart, use_container_width=True)
 
