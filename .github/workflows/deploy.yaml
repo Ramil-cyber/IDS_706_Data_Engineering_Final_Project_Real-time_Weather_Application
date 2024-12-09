@@ -1,0 +1,106 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          . venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Build Docker image
+        run: docker build -f App.Dockerfile -t weatherapp .
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        env:
+          AWS_REGION: us-east-1
+
+      - name: Build, tag, and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: dataengineeringfinal/weatherapp
+          IMAGE_TAG: latest
+        run: |
+          docker tag dataengineeringfinal/weatherapp:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  deploy:
+      needs: build
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Add SSH key
+          uses: webfactory/ssh-agent@v0.5.3
+          with:
+            ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+        - name: Test SSH Connection
+          env:
+            EC2_USER: ${{ secrets.EC2_USER }}
+            EC2_HOST: ${{ secrets.EC2_HOST }}
+          run: |
+            ssh -o StrictHostKeyChecking=no -t $EC2_USER@$EC2_HOST echo "SSH connection successful"
+
+        - name: Deploy to EC2
+          env:
+            ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+            ECR_REPOSITORY: dataengineeringfinal/weatherapp
+            IMAGE_TAG: latest
+            EC2_USER: ${{ secrets.EC2_USER }}
+            EC2_HOST: ${{ secrets.EC2_HOST }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION: us-east-1
+          run: |
+            ssh -o StrictHostKeyChecking=no -t $EC2_USER@$EC2_HOST << EOF
+              set -x
+              sudo dnf update -y
+              sudo dnf install docker -y
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -a -G docker ec2-user
+              mkdir -p ~/.aws
+              echo "[default]" > ~/.aws/credentials
+              echo "aws_access_key_id=${AWS_ACCESS_KEY_ID}" >> ~/.aws/credentials
+              echo "aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials
+              echo "[default]" > ~/.aws/config
+              echo "region=${AWS_REGION}" >> ~/.aws/config
+              aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+              docker pull ${ECR_REGISTRY}:${IMAGE_TAG}
+              docker stop weather_app || true
+              docker rm weather_app || true
+              docker run -d -p 8501:8501 --name weather_app \
+                -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+                -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+                -e AWS_REGION=${AWS_REGION} \
+                ${ECR_REGISTRY}:${IMAGE_TAG}
+              docker exec my-flask-app sh -c 'echo $AWS_ACCESS_KEY_ID && echo $AWS_SECRET_ACCESS_KEY && echo $AWS_REGION'
+            EOF
