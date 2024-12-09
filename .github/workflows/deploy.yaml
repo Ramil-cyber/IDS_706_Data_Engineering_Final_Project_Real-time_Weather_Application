@@ -32,7 +32,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Build Docker image
-        run: docker build -f App.Dockerfile -t weatherapp .
+        run: docker build -f App.Dockerfile -t dataengineeringfinal/weatherapp .
 
       - name: Log in to Amazon ECR
         id: login-ecr
