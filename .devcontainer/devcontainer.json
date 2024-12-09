@@ -14,6 +14,9 @@
       }
   },
   "postCreateCommand": "pip install -r requirements.txt",
-  "forwardPorts": [4040, 8501],
-  "remoteUser": "vscode"
+  "forwardPorts": [8501],
+  "remoteUser": "vscode",
+  "mounts": [
+      "source=${localWorkspaceFolder}/requirements.txt,target=/app/requirements.txt,type=bind"
+  ]
 }
