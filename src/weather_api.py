@@ -1,6 +1,17 @@
 import requests
 from datetime import datetime
 from statistics import mean
+import logging
+
+
+logging.basicConfig(
+    level=logging.INFO,  # Change to DEBUG for more verbose logging
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler(),
+    ],
+)
 
 
 class WeatherAPI:
@@ -11,6 +22,7 @@ class WeatherAPI:
         """
         self.api_key = api_key
         self.base_url = "https://api.openweathermap.org/data/2.5"
+        logging.info("WeatherAPI initialized.")
 
     def get_current_weather(self, city):
         """Get current weather for a city"""
@@ -22,13 +34,15 @@ class WeatherAPI:
         }
 
         try:
+            logging.info(f"Fetching current weather for city: {city}")
             response = requests.get(endpoint, params=params)
             response.raise_for_status()
             data = response.json()
 
             if "main" not in data or "weather" not in data:
+                logging.error(f"Unexpected API response format: {data}")
                 raise ValueError(f"Unexpected API response format: {data}")
-            print(data)
+
             weather_info = {
                 "temperature": data["main"]["temp"],
                 "feels_like": data["main"]["feels_like"],
@@ -46,16 +60,17 @@ class WeatherAPI:
                 ),
             }
 
+            logging.info(f"Current weather data fetched successfully for {city}.")
             return weather_info
 
         except requests.exceptions.RequestException as e:
-            print(f"API Request Error: {str(e)}")
+            logging.error(f"API Request Error: {str(e)}")
             return None
         except ValueError as e:
-            print(f"Data Processing Error: {str(e)}")
+            logging.error(f"Data Processing Error: {str(e)}")
             return None
         except Exception as e:
-            print(f"Unexpected Error: {str(e)}")
+            logging.critical(f"Unexpected Error: {str(e)}")
             return None
 
     def get_forecast(self, city, days=5):
@@ -64,11 +79,13 @@ class WeatherAPI:
         params = {"q": city, "appid": self.api_key, "units": "metric"}
 
         try:
+            logging.info(f"Fetching weather forecast for city: {city} for {days} days.")
             response = requests.get(endpoint, params=params)
             response.raise_for_status()
             data = response.json()
 
             if "list" not in data:
+                logging.error(f"Unexpected API response format: {data}")
                 raise ValueError(f"Unexpected API response format: {data}")
 
             # Process forecast data by day
@@ -109,18 +126,18 @@ class WeatherAPI:
                     }
                 )
 
+            logging.info(f"Weather forecast data fetched successfully for {city}.")
             return forecast
 
         except requests.exceptions.RequestException as e:
-            print(f"API Request Error: {str(e)}")
+            logging.error(f"API Request Error: {str(e)}")
             return None
         except ValueError as e:
-            print(f"Data Processing Error: {str(e)}")
+            logging.error(f"Data Processing Error: {str(e)}")
             return None
         except Exception as e:
-            print(f"Unexpected Error: {str(e)}")
+            logging.critical(f"Unexpected Error: {str(e)}")
             return None
-
 
 # Example usage
 if __name__ == "__main__":
@@ -134,6 +151,14 @@ if __name__ == "__main__":
 
     # Get and display current weather
     current = weather.get_current_weather(city_name)
+    if current:
+        logging.info(f"Current weather: {current}")
+
+    # Get and display forecast
+    forecast = weather.get_forecast(city_name, forecast_days)
+    if forecast:
+        logging.info(f"Weather forecast: {forecast}")
+
     # if current is not None:
     #     print("\nCurrent Weather:")
     #     print(f"City: {current['city']}, {current['country']}")
