@@ -26,6 +26,7 @@ jobs:
         run: make format
 
   lint:
+    needs: format
     name: Lint Code
     runs-on: ubuntu-latest
     steps:
@@ -44,6 +45,7 @@ jobs:
         run: make lint
 
   test:
+    needs: lint
     name: Run Tests
     runs-on: ubuntu-latest
     steps:
@@ -62,6 +64,7 @@ jobs:
         run: make test_file
 
   build:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
