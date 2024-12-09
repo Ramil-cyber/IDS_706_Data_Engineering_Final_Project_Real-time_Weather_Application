@@ -1,6 +1,16 @@
 # For creating the image
-docker build -f .devcontainer/Dockerfile -t dataengineeringfinal/weatherapp .
+
+# Old
+
+#docker build -f .devcontainer/Dockerfile -t dataengineeringfinal/weatherapp .
+
+# New
+
+docker build -f App.Dockerfile -t weatherapp .
+
 
 # For creating container
-docker run -p 8501:8501 dataengineeringfinal/weatherapp
+docker run -d -p 8501:8501 --name weatherapp
 
+docker tag dataengineeringfinal/weatherapp:latest
+docker tag dataengineeringfinal/weatherapp:latest

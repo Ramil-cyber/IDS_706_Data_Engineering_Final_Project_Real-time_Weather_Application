@@ -1,4 +1,4 @@
-name: Deploy to AWS
+name: CI / CD 
 
 on:
   push:
@@ -6,6 +6,61 @@ on:
       - main
 
 jobs:
+
+  format:
+    name: Format Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Format code
+        run: make format
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Lint code
+        run: make lint
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Run tests
+        run: make test_file
+
   build:
     runs-on: ubuntu-latest
 

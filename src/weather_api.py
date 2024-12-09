@@ -33,7 +33,7 @@ class WeatherAPI:
                 "temperature": data["main"]["temp"],
                 "feels_like": data["main"]["feels_like"],
                 "humidity": data["main"]["humidity"],
-                "main_description" : data["weather"][0]["main"],
+                "main_description": data["weather"][0]["main"],
                 "description": data["weather"][0]["description"],
                 "wind_speed": data["wind"]["speed"],
                 "city": data["name"],

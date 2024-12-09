@@ -1,11 +1,11 @@
 try:
-    from src.db import WeatherDatabaseApi
-except:
-    from db import WeatherDatabaseApi
+    from src.db import WeatherDatabaseApi as WeatherDatabaseApi, SQL as SQL
+
+except ImportError:
+    from db import WeatherDatabaseApi as WeatherDatabaseApi, SQL as SQL
+
 
 try:
-    from src.weather_api import WeatherAPI
-except:
-    from weather_api import WeatherAPI
-
-
+    from src.weather_api import WeatherAPI as WeatherAPI
+except ImportError:
+    from weather_api import WeatherAPI as WeatherAPI

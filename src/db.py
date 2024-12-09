@@ -13,14 +13,14 @@ class SQL:
         return query.format(**params)
 
 
-class WeatherDatabaseApi():
+class WeatherDatabaseApi:
 
     necessary_csv_files = {
-        "CityLocation" : 'https://raw.githubusercontent.com/Cavidan-oss/IDS_706_Final_Project/refs/heads/main/data/csv/processed/uscities_processed.csv',
-        "CityInterestingFact" : "https://raw.githubusercontent.com/Cavidan-oss/IDS_706_Final_Project/refs/heads/main/data/csv/raw/city_facts.csv"
+        "CityLocation": "https://raw.githubusercontent.com/Cavidan-oss/IDS_706_Final_Project/refs/heads/main/data/csv/processed/uscities_processed.csv",
+        "CityInterestingFact": "https://raw.githubusercontent.com/Cavidan-oss/IDS_706_Final_Project/refs/heads/main/data/csv/raw/city_facts.csv",
     }
 
-    def __init__(self, database_connection_string, deploy_database = False) -> None:
+    def __init__(self, database_connection_string, deploy_database=False) -> None:
         self.database_connection_string = database_connection_string
         self.deploy_database = deploy_database
 
@@ -33,22 +33,25 @@ class WeatherDatabaseApi():
                 self.create_necessary_tables()
                 print("Created necessary tables.")
 
-                for table_name, csv_path in WeatherDatabaseApi.necessary_csv_files.items():
-                    self.push_csv_to_db(csv_path, table_name, truncate_before_inserting = True)
-
+                for (
+                    table_name,
+                    csv_path,
+                ) in WeatherDatabaseApi.necessary_csv_files.items():
+                    self.push_csv_to_db(
+                        csv_path, table_name, truncate_before_inserting=True
+                    )
 
     def connect_to_db(self, database_connection_string):
         conn = sqlite3.connect(f"{database_connection_string}.db")
         if conn:
-            print('Connected to database succesfully')
+            print("Connected to database succesfully")
 
         return conn
 
-    
     def get_connection(self):
         if not self._conn:
-            raise Exception('Connection with database failed!. Try reconnecting.')
-        
+            raise Exception("Connection with database failed!. Try reconnecting.")
+
         return self._conn
 
     def execute_query(self, query):
@@ -67,7 +70,6 @@ class WeatherDatabaseApi():
             print(e)
             return False
 
-
     def get_item(self, query, cursor):
         """
         Iterator
@@ -76,9 +78,6 @@ class WeatherDatabaseApi():
 
         for result in cursor.fetchall():
             yield result
-
-
-
 
     def get_one_item(self, query):
 
@@ -94,12 +93,12 @@ class WeatherDatabaseApi():
             raise e
 
     def get_all_item(self, query):
-        
+
         connection = self.get_connection()
         try:
             cursor = connection.cursor()
 
-            items = [ item for item in self.get_item(query, cursor) ]
+            items = [item for item in self.get_item(query, cursor)]
 
             return items
 
@@ -107,7 +106,7 @@ class WeatherDatabaseApi():
             raise e
 
     def create_necessary_tables(self):
-        
+
         create_table = """
             CREATE TABLE IF NOT EXISTS  CityLocation (
                     row_id INTEGER PRIMARY KEY,
@@ -145,50 +144,53 @@ class WeatherDatabaseApi():
 
         self.execute_query(create_table2)
 
-
         return True
-
 
     def check_database_deployment(self):
 
-        sqllite_check_table = "SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';"
+        sqllite_check_table = (
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';"
+        )
 
         self.needed_table_names = list(WeatherDatabaseApi.necessary_csv_files.keys())
         res_list = []
         for table in self.needed_table_names:
             # print(table)
             # print(1)
-            res = self.get_one_item(sqllite_check_table.format(table_name = table))
+            res = self.get_one_item(sqllite_check_table.format(table_name=table))
             res_list.append(bool(res))
 
-        
         return True if all(res_list) else False
 
-
-    def push_csv_to_db(self, csv_file_path, table_name, auto_create_table = False, truncate_before_inserting = False):
+    def push_csv_to_db(
+        self,
+        csv_file_path,
+        table_name,
+        auto_create_table=False,
+        truncate_before_inserting=False,
+    ):
         connection = self.get_connection()
 
         try:
             cursor = connection.cursor()
 
-            if csv_file_path.startswith('http'):
+            if csv_file_path.startswith("http"):
                 # response = urllib3.urlopen(csv_file_path)
                 # csv_reader = csv.reader(response)
 
                 response = urllib.request.urlopen(csv_file_path)
-                lines = [l.decode('utf-8') for l in response.readlines()]
+                lines = [i.decode("utf-8") for i in response.readlines()]
                 csv_reader = csv.reader(lines)
 
-
             else:
-                with open(csv_file_path, mode="r", newline="", encoding="utf-8") as csvfile:
+                with open(
+                    csv_file_path, mode="r", newline="", encoding="utf-8"
+                ) as csvfile:
                     csv_reader = csv.reader(csvfile)
-
 
             # Read the header row to get column names
             header = next(csv_reader)
             placeholders = ", ".join(["?" for _ in header])
-            
 
             if auto_create_table:
 
@@ -202,7 +204,6 @@ class WeatherDatabaseApi():
                 cursor.execute(
                     f"CREATE TABLE IF NOT EXISTS {table_name} ({columns_to_create_table})"
                 )
-
 
             if truncate_before_inserting:
                 # Truncate the destionation table
@@ -226,11 +227,11 @@ class WeatherDatabaseApi():
 
         raw_res = self.get_all_item(query)
 
-        res = {(row[0], row[1]) : { "state" : row[2], "city" : row[3] } for row in raw_res }
+        res = {(row[0], row[1]): {"state": row[2], "city": row[3]} for row in raw_res}
 
         return res
-    
-    def get_interesting_fact_for_location(self, lat, long, randomize = True):
+
+    def get_interesting_fact_for_location(self, lat, long, randomize=True):
 
         query = """
             SELECT cif.fact FROM CityInterestingFact cif
@@ -238,12 +239,9 @@ class WeatherDatabaseApi():
             WHERE lat = {lat} AND lng = {long} 
         """
 
-        raw_res = self.get_one_item(query.format(lat = lat , long = long))
+        raw_res = self.get_one_item(query.format(lat=lat, long=long))
 
-
-        return raw_res[0]        
-
-
+        return raw_res[0]
 
     def exit(self):
         current_conn = self.get_connection()
@@ -254,12 +252,13 @@ class WeatherDatabaseApi():
         return True
 
 
+if __name__ == "__main__":
 
-if __name__ == '__main__':
+    test_connection = WeatherDatabaseApi("data/db/application", deploy_database=True)
 
-    test_connection = WeatherDatabaseApi( 'data/db/application', deploy_database = True )
-
-    test_connection.execute_query(""" UPDATE CityLocation SET active_cities = 1 WHERE city = 'Miami' and state_name = 'Florida' """)
+    test_connection.execute_query(
+        """ UPDATE CityLocation SET active_cities = 1 WHERE city = 'Miami' and state_name = 'Florida' """
+    )
     # res = test_connection.get_interesting_fact_for_location( 40.6943,  -73.9249)
 
     # print(res)
@@ -271,4 +270,3 @@ if __name__ == '__main__':
     # res = test_connection.get_active_states()
     # print(res)
     # test_connection.exit()
-
