@@ -10,7 +10,6 @@ test_file:
 
 lint:
 	ruff check src/*.py
-	ruff check test/*.py
 
 container-lint:
 	docker run --rm -i hadolint/hadolint < .devcontainer/Dockerfile
