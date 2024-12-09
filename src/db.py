@@ -166,7 +166,8 @@ class WeatherDatabaseApi:
             res_list.append(bool(res))
 
         logging.info(
-            f"Database deployment status: {'Deployed' if all(res_list) else 'Not Deployed'}"
+            f"""Database deployment status: 
+            {'Deployed' if all(res_list) else 'Not Deployed'}"""
         )
         return all(res_list)
 
@@ -184,7 +185,7 @@ class WeatherDatabaseApi:
 
             if csv_file_path.startswith("http"):
                 response = urllib.request.urlopen(csv_file_path)
-                lines = [l.decode("utf-8") for l in response.readlines()]
+                lines = [i.decode("utf-8") for i in response.readlines()]
                 csv_reader = csv.reader(lines)
             else:
                 with open(
@@ -203,7 +204,8 @@ class WeatherDatabaseApi:
                     ]
                 )
                 cursor.execute(
-                    f"CREATE TABLE IF NOT EXISTS {table_name} ({columns_to_create_table})"
+                    f"""CREATE TABLE IF NOT EXISTS 
+                    {table_name} ({columns_to_create_table})"""
                 )
 
             if truncate_before_inserting:
@@ -222,7 +224,8 @@ class WeatherDatabaseApi:
             raise e
 
     def get_active_states(self):
-        query = "SELECT lat, lng, state_name, city FROM CityLocation WHERE active_cities = 1;"
+        query = """SELECT lat, lng, state_name, 
+        city FROM CityLocation WHERE active_cities = 1;"""
         raw_res = self.get_all_item(query)
 
         res = {(row[0], row[1]): {"state": row[2], "city": row[3]} for row in raw_res}
@@ -232,7 +235,8 @@ class WeatherDatabaseApi:
     def get_interesting_fact_for_location(self, lat, long, randomize=True):
         query = """
             SELECT cif.fact FROM CityInterestingFact cif
-            LEFT JOIN CityLocation cl ON cif.city = cl.city AND cl.state_name = cif.state_name
+            LEFT JOIN CityLocation cl ON cif.city = 
+            cl.city AND cl.state_name = cif.state_name
             WHERE lat = {lat} AND lng = {long} 
         """
 
@@ -256,16 +260,7 @@ if __name__ == "__main__":
 
     test_connection = WeatherDatabaseApi("data/db/application", deploy_database=True)
     test_connection.execute_query(
-        """UPDATE CityLocation SET active_cities = 1 WHERE city = 'Miami' and state_name = 'Florida'"""
+        """UPDATE CityLocation SET active_cities = 1 
+        WHERE city = 'Miami' and state_name = 'Florida'"""
     )
-    # res = test_connection.get_interesting_fact_for_location( 40.6943,  -73.9249)
 
-    # print(res)
-    # test_connection.push_csv_to_db(WeatherDatabaseApi.necessary_csv_files.get('CityLocation'), 'CityLocation', True, True)
-
-    # query = "SELECT lat, lng, state_name, city FROM CityLocation WHERE active_cities = 1;"
-
-    # # res = test_connection.get_all_item(query)
-    # res = test_connection.get_active_states()
-    # print(res)
-    # test_connection.exit()

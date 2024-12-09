@@ -139,6 +139,7 @@ class WeatherAPI:
             logging.critical(f"Unexpected Error: {str(e)}")
             return None
 
+
 # Example usage
 if __name__ == "__main__":
     # Configuration
@@ -158,36 +159,3 @@ if __name__ == "__main__":
     forecast = weather.get_forecast(city_name, forecast_days)
     if forecast:
         logging.info(f"Weather forecast: {forecast}")
-
-    # if current is not None:
-    #     print("\nCurrent Weather:")
-    #     print(f"City: {current['city']}, {current['country']}")
-    #     print(f"Temperature: {current['temperature']}°C")
-    #     print(f"Feels like: {current['feels_like']}°C")
-    #     print(f"Description: {current['description']}")
-    #     print(f"Humidity: {current['humidity']}%")
-    #     print(f"Wind Speed: {current['wind_speed']} m/s")
-    #     print(f"Sunrise: {current['sunrise']}")
-    #     print(f"Sunset: {current['sunset']}")
-    # else:
-    #     print(
-    #         "Failed to get weather data. Please check your API key and internet connection."
-    #     )
-
-    # # Get and display forecast
-    # print(f"\n{forecast_days}-Day Weather Forecast for {city_name}:")
-    # forecast = weather.get_forecast(city_name)
-    # print(forecast)
-    # if forecast is not None:
-    #     for day in forecast:
-    #         print(f"\n{day['date']}:")
-    #         print(type(day['date']))
-    #         print(
-    #             f"  Temperature: {day['min_temp']}°C to {day['max_temp']}°C (avg: {day['avg_temp']}°C)"
-    #         )
-    #         print(f"  Description: {day['description']}")
-    #         print(f"  Wind Speed: {day['avg_wind']} m/s")
-    # else:
-    #     print(
-    #         "Failed to get forecast data. Please check your API key and internet connection."
-    #     )
