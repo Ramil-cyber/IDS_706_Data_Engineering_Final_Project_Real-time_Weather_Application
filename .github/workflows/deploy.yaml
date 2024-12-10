@@ -154,6 +154,7 @@ jobs:
               echo "[default]" > ~/.aws/config
               echo "region=${AWS_REGION}" >> ~/.aws/config
               aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+              docker image prune -f
               docker pull ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
               sudo docker stop weather_app || true
               sudo docker rm weather_app || true
