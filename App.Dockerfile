@@ -8,7 +8,7 @@ COPY . /app
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the application port
+# Expose the application port 8080 8051
 EXPOSE 8080 8051
 
 RUN python /app/deployment.py
