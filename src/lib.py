@@ -11,7 +11,7 @@ def process_raw_cities_csv(
     # Update the lambda function to check both city and state
     df["active_cities"] = df.apply(lambda row: 1 if (row['city'], row['state_name']) in city_state_set else 0, axis=1)
 
-    df.to_csv(target_file_path, index=False)
+    df.to_csv(target_file_path)
 
     return True
 
