@@ -20,7 +20,7 @@ logging.basicConfig(
 
 load_dotenv()
 
-
+#@st.cache_data
 def initialize_weather_db():
     """Initialize WeatherDatabaseApi."""
     logging.info("Initializing WeatherDatabaseApi.")
@@ -116,8 +116,8 @@ def create_forecast_chart(forecast_data):
         logging.error(f"Error while creating forecast chart: {e}")
         raise
 
-
-def create_map(weather_db):
+@st.cache_data
+def create_map(_weather_db):
     """Create a folium map with weather data."""
     logging.info("Initializing map creation.")
     try:
@@ -128,7 +128,7 @@ def create_map(weather_db):
         )
         logging.debug("Base map initialized.")
 
-        city_data = weather_db.get_active_states()
+        city_data = _weather_db.get_active_states()
         logging.debug(f"Retrieved city data: {len(city_data)} locations found.")
 
         for city_location, city_details in city_data.items():
@@ -136,6 +136,7 @@ def create_map(weather_db):
                 [city_location[0], city_location[1]],
                 popup=city_details["city"],
                 tooltip=city_details["city"],
+                icon=folium.Icon(color="blue", icon="flag")
             ).add_to(world_map)
         logging.info("Added all city markers to the map.")
 
@@ -180,7 +181,6 @@ def create_map(weather_db):
     except Exception as e:
         logging.error(f"Error occurred while creating the map: {e}")
         raise
-
 
 def display_sidebar(city_details, live_data, chart, other_information):
     """Update the sidebar with city weather details."""
@@ -295,7 +295,7 @@ def main():
             page_title="Travel Exploration",
             page_icon="🌍",
             layout="wide",
-            initial_sidebar_state="collapsed",
+            initial_sidebar_state="expanded",
         )
         logging.debug("Page configuration set successfully.")
 
