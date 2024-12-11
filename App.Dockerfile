@@ -14,4 +14,4 @@ EXPOSE 8080 8051
 RUN python /app/deployment.py
 
 # Set the correct command to run the Streamlit app
-CMD ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "main.py", "--server.port=8080", "--server.address=0.0.0.0"]
