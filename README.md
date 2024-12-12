@@ -16,7 +16,7 @@ This application provides real-time weather details and interesting information 
 Several components work together seamlessly to ensure the full functionality of the weather application.
 
 ### 1) SQL Lite
-The SQLite database is used to store all the essential data required by the weather application, including city locations and detailed information about them. This database was chosen for its lightweight nature and fast performance, making it ideal for handling localized application data efficiently. It plays a critical role in providing a structured and reliable storage solution.
+The SQLite database is used to store all the essential data required by the weather application, including city locations and detailed information about them. This database was chosen for its lightweight nature and fast performance, making it ideal for handling localized application data efficiently. It plays a critical role in providing a structured and reliable storage solution.Here is the table schema structure for the weather application.
 
 ![Alt Text](images/DataModelling.jpeg)
 
