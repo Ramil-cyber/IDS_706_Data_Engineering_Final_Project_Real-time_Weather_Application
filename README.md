@@ -18,6 +18,8 @@ Several components work together seamlessly to ensure the full functionality of 
 ### 1) SQL Lite
 The SQLite database is used to store all the essential data required by the weather application, including city locations and detailed information about them. This database was chosen for its lightweight nature and fast performance, making it ideal for handling localized application data efficiently. It plays a critical role in providing a structured and reliable storage solution.
 
+![Alt Text](images/DataModelling.jpeg)
+
 ### 2) Database API
 The Database API serves as a bridge between the application and the SQLite database, encapsulating all interactions to ensure efficiency and consistency. It simplifies tasks such as spinning up a new database from scratch, retrieving, and uploading CSV files into the database. Additionally, the API handles exception management, logging, and database optimization to ensure smooth operations and reliability.
 
