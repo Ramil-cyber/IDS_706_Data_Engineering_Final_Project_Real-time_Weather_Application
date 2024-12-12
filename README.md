@@ -1,4 +1,5 @@
 # Final Project
+![alt text](images/ArchitectureDiagram.jpg)
 # 1. what the project does
 # 2. dependencies
 
