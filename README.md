@@ -1,4 +1,12 @@
-# Final Project
+# Data Engineering Final Project: Real-time Weather Dashboard
+[![CI / CD](https://github.com/Cavidan-oss/IDS_706_Final_Project/actions/workflows/deploy.yaml/badge.svg)](https://github.com/Cavidan-oss/IDS_706_Final_Project/actions/workflows/deploy.yaml)
+
+### Team members
+
+Javidan Karimli, Ramil Mammadov, Jennifer Li, Shiyue Zhou
+
+### Architectural Diagram
+
 ![Alt Text](https://github.com/Cavidan-oss/IDS_706_Final_Project/blob/e2c0b81327eeef04a33d90b79855a073b3606fdb/images/ArchitectureDiagram.jpg)
 
 # 1. Overview
@@ -59,18 +67,18 @@ Since the database is included with the application, there is a possibility of d
 Ensure you have created a .env file in the root directory with the appropriate OpenWeather API access key to enable weather data retrieval as discussed above.
 
 
-## Step 2: Run the application
+## Step 3: Run the application
 1. Open a terminal or command prompt in the directory where your Python file (main.py) is saved.
 2. Run the following command:
 ```bash
 streamlit run main.py
 ```
-## Step 3: View the Dashboard
+## Step 4: View the Dashboard
 Open the Local URL (e.g., http://localhost:8501) in your web browser to view the dashboard.
 
 ![Alt Text](https://github.com/Cavidan-oss/IDS_706_Final_Project/blob/a14653baee98fc0a1736004f93b043f5003a125a/images/appinterface.png)
 
-## **5. Deployment**
+# 5. Deployment
 
 The application is fully deployed using Docker, with two distinct Dockerfiles included in the project:  
 
@@ -167,3 +175,5 @@ The application currently faces several limitations. It is constrained by the ra
 
 # 9. AI Pair Programming Tool: GitHub Copilot
 We write our code in Visual Studio Code and leverage AI tools for debugging assistance and code suggestions. These tools have proven to be invaluable in streamlining and enhancing our development process.
+
+
