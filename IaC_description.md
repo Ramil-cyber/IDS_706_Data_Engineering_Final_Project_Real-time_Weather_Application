@@ -57,9 +57,7 @@
     ```
 2. Run the application container:
    ```bash
-    sudo docker run -d -p 9999:9999 --name weather_app \
-  -e WEATHER_API_ACCESS_TOKEN=${WEATHER_API_ACCESS_TOKEN} \
-  ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+    sudo docker run -d -p 9999:9999 --name weather_app \-e WEATHER_API_ACCESS_TOKEN=${WEATHER_API_ACCESS_TOKEN} \${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
     ```
 
 
@@ -67,6 +65,7 @@
 To ensure the container is properly configured:
    ```bash
    sudo docker exec weather_app sh -c 'echo $AWS_ACCESS_KEY_ID && echo $AWS_SECRET_ACCESS_KEY && echo $AWS_REGION'
-    ```
+```  
+
 
 ![alt text](images/Deployment.png)
