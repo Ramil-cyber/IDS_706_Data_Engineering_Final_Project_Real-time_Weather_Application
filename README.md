@@ -145,13 +145,6 @@ By leveraging these Dockerfiles, the application offers flexibility for both dev
     ```
 
 
-### **5. Verifying Environment Variables**
-To ensure the container is properly configured:
-   ```bash
-   sudo docker exec weather_app sh -c 'echo $AWS_ACCESS_KEY_ID && echo $AWS_SECRET_ACCESS_KEY && echo $AWS_REGION'
-```  
-
-
 ##  Deployment Workflow
 ![alt text](images/Deployment.png)
 
