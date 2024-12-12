@@ -153,7 +153,7 @@ By leveraging these Dockerfiles, the application offers flexibility for both dev
    ```bash
     sudo docker run -d -p 9999:9999 --name weather_app \-e WEATHER_API_ACCESS_TOKEN=${WEATHER_API_ACCESS_TOKEN} \${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
     ```
-![alt text](images/DeploymentEC2.png)
+![alt text](images/DeploymentEC2.jpg)
 
 ##  CICD Deployment Workflow
 ![alt text](images/Deployment.png)
