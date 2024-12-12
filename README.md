@@ -68,6 +68,7 @@ streamlit run main.py
 ## Step 3: View the Dashboard
 Open the Local URL (e.g., http://localhost:8501) in your web browser to view the dashboard.
 
+![Alt Text](https://github.com/Cavidan-oss/IDS_706_Final_Project/blob/a14653baee98fc0a1736004f93b043f5003a125a/images/appinterface.png)
 
 ## **5. Deployment**
 
@@ -166,7 +167,7 @@ To ensure the container is properly configured:
 •	We used Locust to perform the load testing, to verify the microservice's performance. The testing result shows that when scaling to 10,000 concurrent users, our microservice demonstrates strong system reliability and stability, with the service maintaining a consistent 0% failure rate throughout the testing duration while handling approximately 1,800-2,000 requests per second (RPS). The reason why the actual RPS is below our 10,000 RPS target is because OpenWeather API sets a free tier limit of 2,000 calls per day, resulting this bottleneck for the performance. However, as evidenced by the steady RPS graph maintaining around 1,800-2,000 requests per second once reaching peak load and a consistent response time pattern, our system exhibits excellent stability. 
 
 
-# 8. Limitations and Future Improvements**
+# 8. Limitations and Future Improvements
 
 The application currently faces several limitations. It is constrained by the rate limits of the WeatherAPI, which restrict the frequency of data retrieval. Additionally, the lack of caching mechanisms leads to redundant API calls and slower performance, particularly for map objects and refreshing content. Streamlit's current capabilities also pose challenges in handling highly interactive and dynamic content across the website, which can impact user experience. For future improvements, allowing users to input their own WeatherAPI access keys could help bypass rate limits and provide more flexibility. Implementing caching methodologies would significantly reduce the number of API calls and improve overall efficiency. Furthermore, optimizing Streamlit's handling of interactive elements would enhance the user experience, making the application more robust and user-friendly.
 
