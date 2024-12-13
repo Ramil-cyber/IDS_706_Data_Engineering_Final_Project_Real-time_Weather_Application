@@ -5,6 +5,9 @@
 
 Javidan Karimli, Ramil Mammadov, Jennifer Li, Shiyue Zhou
 
+![Link to the Project Video](https://youtu.be/iKW_625ALNQ)
+
+
 ### Architectural Diagram
 
 ![Alt Text](https://github.com/Cavidan-oss/IDS_706_Final_Project/blob/e2c0b81327eeef04a33d90b79855a073b3606fdb/images/ArchitectureDiagram.jpg)
