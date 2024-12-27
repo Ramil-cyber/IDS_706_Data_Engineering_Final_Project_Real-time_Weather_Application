@@ -1,4 +1,4 @@
-# Data Engineering Final Project: Real-time Weather Dashboard
+# Data Engineering Final Project: Live Weather Forecast Application
 [![CI / CD](https://github.com/Cavidan-oss/IDS_706_Final_Project/actions/workflows/deploy.yaml/badge.svg)](https://github.com/Cavidan-oss/IDS_706_Final_Project/actions/workflows/deploy.yaml)
 
 ### Team members
